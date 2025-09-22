@@ -1,0 +1,53 @@
+--1.	Вывести количество покупателей с именами, начинающими на букву A-D
+
+-- SELECT count(*) as ADcustomers_total
+-- FROM cust 
+-- WHERE name ~* '^[A-D]';
+
+--2.	Вывести наименьший и наибольший рейтинг из таблицы покупателей.
+
+-- SELECT MIN(rating) AS min_rating, MAX(rating) AS max_rating
+-- FROM cust 
+
+--3.	Вывести для каждого покупателя наибольший номер продавца, у которого он совершал заказы.
+
+-- SELECT cust.name, MAX(ord.snum) AS max_snum
+-- FROM cust
+-- JOIN ord ON ord.cnum = cust.cnum
+-- GROUP BY cust.name
+-- ORDER BY cust.name ASC;
+
+--4.	Вывести число уникальных покупателей, которые покупали продукты с номерами 1004-1005.
+
+-- SELECT COUNT(DISTINCT ord.cnum) AS unique_customers
+-- FROM ord 
+-- WHERE ord.pnum IN (1004, 1005);
+
+--5.	Вывести для каждого покупателя его номер и общее количество проданных продуктов, если это количество меньше, чем 10.
+
+-- SELECT ord.cnum, COUNT(ord.pnum) AS total_prod
+-- FROM ord
+-- GROUP BY ord.cnum
+-- HAVING COUNT(ord.pnum) < 10;
+
+--6.	Вывести количество заказов для всех уникальных пар продукт-продавец, 
+--между которыми осуществлялись заказы.
+
+-- SELECT COUNT(*) AS order_unique_count, ord.pnum, ord.snum
+-- FROM ord
+-- GROUP BY ord.pnum, ord.snum;
+
+--7.	Вывести все даты, в которые в заказах участвовали ровно 1 продавец 
+--и 1 покупатель.
+
+-- SELECT o.ord_date
+-- FROM ord o
+-- GROUP BY o.ord_date
+-- HAVING COUNT(DISTINCT o.cnum) = 1 AND COUNT(DISTINCT o.snum) = 1;
+
+
+
+
+
+
+

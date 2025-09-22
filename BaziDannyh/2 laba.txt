@@ -1,0 +1,36 @@
+вариант 2 
+
+1. 
+SELECT * 
+FROM ord 
+WHERE snum = 3002
+
+2.
+SELECT snum, city, name, comm
+FROM sal 
+WHERE comm > 0.11
+
+3.
+SELECT cnum 
+FROM ord 
+WHERE snum > 3002
+GROUP BY cnum
+
+4.
+SELECT *
+FROM prod 
+WHERE weight <= 1000 AND city <> 'Moscow'
+
+5. 
+SELECT * 
+FROM ord 
+WHERE snum = 3003 OR snum = 3004 OR snum = 3005
+
+SELECT * 
+FROM ord SELECT * 
+FROM ord 
+WHERE snum IN (3003, 3004, 3005)
+
+SELECT * 
+FROM ord 
+WHERE snum BETWEEN 3003 AND 3005
