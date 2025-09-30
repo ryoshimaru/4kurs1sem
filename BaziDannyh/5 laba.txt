@@ -1,0 +1,85 @@
+-- 1 Вывести информацию о всех заказах. Добавить для каждого заказа его
+-- покупателя, если таковой имеется, или NULL, если покупатель неизвестен.
+
+-- SELECT onum,
+--        ord_date,
+--        amt,
+--        ord.cnum,
+--        name AS customer_name
+-- FROM ord
+-- LEFT JOIN cust
+-- ON ord.cnum = cust.cnum;
+
+
+-- 2 Напишите запрос, который выведет номер и стоимость заказа, название и город
+-- продукта только для заказов, в которых продукт не из города Обнинск.
+
+-- SELECT onum,
+--        amt,
+--        name AS product_name,
+--        city
+-- FROM ord
+-- JOIN prod
+-- ON ord.pnum = prod.pnum
+-- WHERE prod.city <> 'Obninsk';
+
+
+-- 3 Вывести список имен всех покупателей. Для покупателей, рейтинг которых
+-- более или равен 300, присоединить объем максимального заказа этого покупателя.
+
+-- SELECT name AS customer_name,
+--        CASE WHEN rating >= 300 THEN MAX(amt) END AS max_order
+-- FROM cust
+-- LEFT JOIN ord
+-- ON cust.cnum = ord.cnum
+-- GROUP BY name, rating;
+
+
+-- 4 Вывести все пары номеров продуктов. Исключить комбинации продуктов с
+-- самими собой, а также дубликаты строк, выводящие пары в обратном порядке.
+
+-- SELECT p1.pnum AS product1,
+--        p2.pnum AS product2
+-- FROM prod p1
+-- CROSS JOIN prod p2
+-- WHERE p1.pnum < p2.pnum;
+
+-- 5 Вывести результат естественного соединение таблиц sal и cust. По каким полям
+-- соединились таблицы?
+
+-- SELECT *
+-- FROM sal
+-- NATURAL JOIN cust;
+
+
+-- 6 Вывести полный список всех городов из всех таблиц, в которых встречалась
+-- буква a.
+
+-- SELECT city FROM cust WHERE city LIKE '%a%'
+-- UNION
+-- SELECT city FROM prod WHERE city LIKE '%a%'
+-- UNION
+-- SELECT city FROM sal WHERE city LIKE '%a%';
+
+
+-- 7 Вывести список городов, в которых производятся товары, названия которых
+-- содержат букву e, и проживают продавцы, названия которых содержат букву e.
+
+-- SELECT city
+-- FROM prod
+-- WHERE name LIKE '%e%'
+-- INTERSECT
+-- SELECT city
+-- FROM sal
+-- WHERE name LIKE '%e%';
+
+
+-- 8 Вывести имена и общий объем (сумму количество товаров) заказов всех
+-- продавцов, находящихся в городах, где не живет ни одного покупателя.
+
+-- SELECT name AS seller_name,
+--        (SELECT SUM(amt)
+--         FROM ord
+--         WHERE ord.snum = sal.snum) AS total_quantity
+-- FROM sal
+-- WHERE city NOT IN (SELECT DISTINCT city FROM cust);

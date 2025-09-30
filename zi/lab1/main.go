@@ -107,7 +107,7 @@ func evklidExtended() (int, int, int) {
 
 func main() {
 	fmt.Println(fastExp(11, 6, 23))
-	fmt.Println(simpleNum(17))
+	fmt.Println(simpleNum(7))
 
 	nod, x, y := evklidExtended()
 

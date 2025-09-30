@@ -1,0 +1,96 @@
+
+-- --1.Вывести покупателей, рейтинг которых больше среднего рейтинга всех покупателей.
+-- SELECT *
+-- FROM cust
+-- WHERE rating > (SELECT AVG(rating) FROM cust);
+
+-- --2.Вывести общее число выполненных заказов для каждого продавца, у которого это число больше, чем у продавца с номером 3002.
+-- SELECT snum, COUNT(*)
+-- from ord
+-- GROUP BY snum
+-- HAVING COUNT(*) > (
+--     SELECT COUNT(*) FROM ord WHERE snum = 3002
+-- );
+-- -- 3002 самый большой 
+
+-- --3. Выбрать продукты, которые поставлялись продавцом с номером 3002 для покупателей, которые когда-либо делали заказы у продавца 3005.
+-- SELECT *
+-- FROM prod
+-- WHERE pnum IN (
+--     SELECT ord.pnum
+--     FROM ord 
+--     WHERE ord.snum = 3002
+--       AND ord.cnum IN (
+--           SELECT cnum
+--           FROM ord
+--           WHERE snum = 3005
+--       )
+-- );
+
+
+-- --4.Вывести названия всех продавцов, которые никогда не заказывали товары из Санкт-Петербурга.
+-- SELECT name
+-- FROM sal
+-- WHERE snum NOT IN (
+--     SELECT snum
+--     FROM ord
+--     WHERE snum IN (
+--         SELECT snum
+--         FROM sal
+--         WHERE city = 'Saint Petersburg'
+--     )
+-- );
+
+
+-- --5.Вывести заказы, в которых количество товара больше, чем количество товара в каждом из заказов за 1 сентября 2025.
+-- SELECT *
+-- FROM ord
+-- WHERE amt > ALL (
+--     SELECT amt
+--     FROM ord
+--     WHERE ord_date = DATE '2025-09-01'
+-- );
+-- --опять странный запрос, 1 сентября мвп по продажам,никто не перегнал
+
+-- --6. Вывести товары, которые никогда не заказывались покупателями из города, в котором произведен этот товар.
+-- SELECT *
+-- FROM prod 
+-- WHERE NOT EXISTS (
+--     SELECT 1
+--     FROM ord 
+--     WHERE ord.pnum = p.pnum
+--       AND ord.cnum IN (
+--           SELECT cnum
+--           FROM cust
+--           WHERE city = prod.city
+--       )
+-- )
+-- order by pnum;
+
+-- --7.Вывести всю информацию о покупателях с дополнительным столбцом «категория покупателя» со следующими вариантами значений: «новый», если рейтинг меньше 200, «постоянный», если рейтинг от 200 до 300, «ВИП-клиент», если рейтинг больше 300.
+-- SELECT cust.*,
+--        CASE
+--            WHEN rating < 200 THEN 'новый'
+--            WHEN rating BETWEEN 200 AND 300 THEN 'постоянный'
+--            WHEN rating > 300 THEN 'ВИП-клиент'
+--        END
+-- FROM cust 
+-- order by name;
+  
+-- --8.Вывести из таблицы заказов уникальные номера покупателей и показатель активности каждого из них по датам заказов: «постоянный» — заказы в более 5 разных дат, «частый» — заказы в 3-5 различных дат, «редкий» — заказы в 1-2 даты.
+-- SELECT distinct(cnum),
+--        CASE
+--            WHEN (SELECT COUNT(DISTINCT ord_date)
+--                  FROM ord 
+--                  WHERE ord.cnum = ord.cnum) > 5
+--                 THEN 'постоянный'
+--            WHEN (SELECT COUNT(DISTINCT ord_date)
+--                  FROM ord 
+--                  WHERE ord.cnum = ord.cnum) BETWEEN 3 AND 5
+--                 THEN 'частый'
+--            ELSE 'редкий'
+--        END
+-- FROM ord
+-- order by cnum;
+
+
