@@ -8,27 +8,23 @@ import (
 	"strings"
 )
 
-// Token структура для токенов
 type Token struct {
-	Type  string // "PLUS", "MINUS", "MUL", "DIV", "LPAREN", "RPAREN", "NUMBER", "ID", "EOF"
-	Value string // значение для NUMBER и ID
+	Type  string
+	Value string
 }
 
-// Lexer структура для лексического анализатора
 type Lexer struct {
-	input   string  // входная строка
-	tokens  []Token // список токенов
-	current int     // индекс текущего токена
+	input   string // входная строка
+	tokens  []Token
+	current int
 }
 
-// NewLexer создаёт новый лексер
 func NewLexer(input string) *Lexer {
 	l := &Lexer{input: strings.TrimSpace(input)}
 	l.tokenize()
 	return l
 }
 
-// tokenize разбивает строку на токены
 func (l *Lexer) tokenize() {
 	tokenSpecs := []struct {
 		typ   string
@@ -44,7 +40,7 @@ func (l *Lexer) tokenize() {
 		{"RPAREN", regexp.MustCompile(`^\)`)},
 	}
 
-	l.input = regexp.MustCompile(`\s+`).ReplaceAllString(l.input, "") // убираем пробелы
+	l.input = regexp.MustCompile(`\s+`).ReplaceAllString(l.input, "")
 
 	pos := 0
 	for pos < len(l.input) {
@@ -66,7 +62,6 @@ func (l *Lexer) tokenize() {
 	l.tokens = append(l.tokens, Token{Type: "EOF", Value: ""})
 }
 
-// getNextToken возвращает следующий токен
 func (l *Lexer) getNextToken() Token {
 	if l.current >= len(l.tokens) {
 		return Token{Type: "EOF", Value: ""}
@@ -76,27 +71,23 @@ func (l *Lexer) getNextToken() Token {
 	return tok
 }
 
-// Node структура для узла синтаксического дерева
 type Node struct {
-	Label    string  // "S", "E", "+", "NUMBER" и т.д.
-	Value    string  // для листьев (number/id)
-	Children []*Node // дети
+	Label    string
+	Value    string
+	Children []*Node
 }
 
-// Parser структура для синтаксического анализатора
 type Parser struct {
 	lexer *Lexer
 	curr  Token
 }
 
-// NewParser создаёт парсер
 func NewParser(lexer *Lexer) *Parser {
 	p := &Parser{lexer: lexer}
 	p.curr = p.lexer.getNextToken()
 	return p
 }
 
-// match проверяет и потребляет токен
 func (p *Parser) match(expected string) {
 	if p.curr.Type == expected {
 		p.curr = p.lexer.getNextToken()
@@ -149,7 +140,7 @@ func (p *Parser) parseE() *Node {
 		opNode.Children = append(opNode.Children, t, e)
 		return opNode
 	default:
-		return node // ε
+		return node
 	}
 }
 
@@ -180,7 +171,7 @@ func (p *Parser) parseTPrime() *Node {
 		opNode.Children = append(opNode.Children, f, tPrime)
 		return opNode
 	default:
-		return node // ε
+		return node
 	}
 }
 
@@ -204,9 +195,6 @@ func (p *Parser) parseF() *Node {
 	return node
 }
 
-/************** АККУРАТНЫЙ ВЫВОД **************/
-
-// helper: строка для узла (LABEL[: value])
 func nodeCaption(n *Node) string {
 	if n.Value != "" {
 		return fmt.Sprintf("%s: %s", n.Label, n.Value)
@@ -239,7 +227,6 @@ func printFancy(sb *strings.Builder, n *Node, prefix string, isLast bool) {
 	}
 }
 
-// форматированный вывод токенов (без EOF)
 func formatTokens(ts []Token) string {
 	var b strings.Builder
 	for _, t := range ts {
@@ -267,7 +254,6 @@ func main() {
 
 	lexer := NewLexer(input)
 
-	// 1) печатаем токены до парсинга (лексер уже их построил)
 	fmt.Println("Токены:")
 	fmt.Println(" ", formatTokens(lexer.tokens))
 
