@@ -202,10 +202,8 @@ func nodeCaption(n *Node) string {
 	return n.Label
 }
 
-// красивое дерево с псевдографикой
 func renderTree(n *Node) string {
 	var sb strings.Builder
-	// корень без соединителя
 	sb.WriteString(nodeCaption(n) + "\n")
 	for i, ch := range n.Children {
 		isLast := i == len(n.Children)-1

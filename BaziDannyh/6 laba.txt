@@ -1,0 +1,106 @@
+-- 1. Вывести список существующих индексов в БД. Являются ли индексы кластеризованными? 
+-- Какую структуру в памяти они имеют?
+
+-- SELECT *
+-- FROM pg_indexes
+-- WHERE schemaname = 'public';
+
+-- 2. Создать индекс для ускорения сортировки таблицы покупателей по городу. 
+-- Проверьте, используется ли созданный индекс при сортировке.
+
+-- CREATE INDEX idx_cust_city ON cust(city)
+
+-- EXPLAIN SELECT * FROM cust ORDER BY city;
+
+-- 3. Проверьте, используется ли теперь созданный индекс при сортировке?
+
+-- EXPLAIN SELECT * FROM cust ORDER BY city;
+
+-- Вывести полную информацию о заказе, его продавце, его продукте и его покупателе, только если:
+-- количество товара (amt) в этом заказе больше, чем среднее по таблице,
+-- товар не из Санкт-Петербурга, 
+-- продавец совершил не более 10 заказов за все время,
+-- рейтинг покупателя не ниже, чем хотя бы у одного покупателя из Москвы.  
+
+-- 4.Сохранить результат как новую таблицу и вывести ее содержимое
+
+-- CREATE TABLE big_query_result AS
+-- SELECT 
+--     o.onum,
+--     o.amt,
+--     o.ord_date,
+--     s.name AS seller,
+--     p.name AS product,
+--     c.name AS customer
+-- FROM ord o
+-- JOIN sal s ON o.snum = s.snum
+-- JOIN prod p ON o.pnum = p.pnum
+-- JOIN cust c ON o.cnum = c.cnum
+-- WHERE o.amt > (SELECT AVG(amt) FROM ord)
+--   AND p.city <> 'Saint Petersburg'
+--   AND o.snum IN (
+--         SELECT snum FROM ord GROUP BY snum HAVING COUNT(*) <= 10
+--   )
+--   AND c.rating >= (
+--         SELECT MIN(rating) FROM cust WHERE city = 'Moscow'
+--   );
+
+-- SELECT * FROM big_query_result;
+
+-- 5 Сохранить результат как представление и вывести его содержимое.
+
+-- CREATE OR REPLACE VIEW v_big_query AS
+-- SELECT 
+--     o.onum, o.amt, o.ord_date,
+--     s.name AS seller, p.name AS product, c.name AS customer
+-- FROM ord o
+-- JOIN sal s ON o.snum = s.snum
+-- JOIN prod p ON o.pnum = p.pnum
+-- JOIN cust c ON o.cnum = c.cnum
+-- WHERE o.amt > (SELECT AVG(amt) FROM ord)
+--   AND p.city <> 'Saint Petersburg'
+--   AND o.snum IN (SELECT snum FROM ord GROUP BY snum HAVING COUNT(*) <= 10)
+--   AND c.rating >= (SELECT MIN(rating) FROM cust WHERE city = 'Moscow');
+
+-- SELECT * FROM v_big_query;
+
+-- 6 Сохранить результат как материализованное представление и вывести его
+-- содержимое.
+
+-- CREATE MATERIALIZED VIEW mv_big_query AS
+-- SELECT 
+--     o.onum, o.amt, o.ord_date,
+--     s.name AS seller, p.name AS product, c.name AS customer
+-- FROM ord o
+-- JOIN sal s ON o.snum = s.snum
+-- JOIN prod p ON o.pnum = p.pnum
+-- JOIN cust c ON o.cnum = c.cnum
+-- WHERE o.amt > (SELECT AVG(amt) FROM ord)
+--   AND p.city <> 'Saint Petersburg'
+--   AND o.snum IN (SELECT snum FROM ord GROUP BY snum HAVING COUNT(*) <= 10)
+--   AND c.rating >= (SELECT MIN(rating) FROM cust WHERE city = 'Moscow');
+
+-- SELECT * FROM mv_big_query;
+
+-- REFRESH MATERIALIZED VIEW mv_big_query;
+
+
+-- INSERT INTO ord (onum, amt, ord_date, snum, pnum, cnum)
+-- VALUES (4050, 50, '2025-10-07', 1, 1, 1);
+
+-- 7 Использовать для запроса блок оператора WITH и вывести результат.
+
+-- WITH big_query AS (
+--     SELECT 
+--         o.onum, o.amt, o.ord_date,
+--         s.name AS seller, p.name AS product, c.name AS customer
+--     FROM ord o
+--     JOIN sal s ON o.snum = s.snum
+--     JOIN prod p ON o.pnum = p.pnum
+--     JOIN cust c ON o.cnum = c.cnum
+--     WHERE o.amt > (SELECT AVG(amt) FROM ord)
+--       AND p.city <> 'Saint Petersburg'
+--       AND o.snum IN (SELECT snum FROM ord GROUP BY snum HAVING COUNT(*) <= 10)
+--       AND c.rating >= (SELECT MIN(rating) FROM cust WHERE city = 'Moscow')
+-- )
+-- SELECT * FROM big_query;

@@ -1,11 +1,11 @@
 S
 ├── T
-│   ├── NUMBER: 2
+│   ├── NUMBER: 3
 │   └── T'
 └── +
     ├── T
-    │   ├── NUMBER: 3
+    │   ├── NUMBER: 5
     │   └── *
-    │       ├── NUMBER: 5
+    │       ├── NUMBER: 4
     │       └── T'
     └── E
